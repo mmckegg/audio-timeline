@@ -56,6 +56,7 @@ timeline.start(startAt, startOffset, duration)
 
 ```js
 var RenderStream = require('audio-timeline/render-stream')
+var WaveFileWriter = require('wav').FileWriter
 
 var startOffset = 0
 var duration = 71
