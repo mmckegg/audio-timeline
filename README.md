@@ -44,17 +44,12 @@ timeline.set({
 ```
 ### Playback
 
-```
-// wait for sample metadata to load
-setTimeout(function () {
+```js
+var startAt = audioContext.currentTime + 0.1
+var startOffset = 0
+var duration = 71
 
-  var startAt = audioContext.currentTime + 0.1
-  var startOffset = 0
-  var duration = 71
-
-  timeline.start(startAt, startOffset, duration)
-
-}, 200)
+timeline.start(startAt, startOffset, duration)
 ```
 
 ### Render to disk
