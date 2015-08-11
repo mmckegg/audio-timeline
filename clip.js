@@ -21,17 +21,30 @@ function AudioClip (context) {
     src: Property()
   })
 
+  obs.context = context
   obs.loading = Property(false)
 
   var masterOutput = context.audio.createGain() 
   masterOutput.connect(context.output)
 
-  obs.duration.resolved = computed([fullDuration, obs.duration, obs.startOffset], function (fullDuration, duration, startOffset) {
+  obs.startOffset.max = fullDuration
+  obs.duration.max = computed([fullDuration, obs.startOffset], function (fullDuration, startOffset) {
     if (fullDuration) {
-      return Math.min(fullDuration - startOffset, duration)
+      return fullDuration - startOffset
     } else {
       return 0
     }
+  })
+  obs.duration.resolved = computed([obs.duration.max, obs.duration], function (max, duration) {
+    return Math.min(max, duration || max)
+  })
+
+
+
+  obs.resolved = Struct({
+    duration: obs.duration.resolved,
+    startOffset: obs.startOffset,
+    src: obs.src
   })
 
   obs.position = Property(0)
@@ -53,10 +66,10 @@ function AudioClip (context) {
   obs.start = function (at, timeOffset, duration) {
     var stopAt = null
 
-    timeOffset = timeOffset || 0
-    maxDuration = obs.duration.resolved() - timeOffset
+    var maxDuration = obs.duration.resolved()
     duration = Math.min(duration || maxDuration, maxDuration)
-    var startTime = at - timeOffset
+
+    var startTime = at - (timeOffset || 0)
     var currentOffset = obs.startOffset()
     var nextTime = startTime
     var remaining = duration
@@ -74,7 +87,7 @@ function AudioClip (context) {
         stopped()
       }
 
-      if (nextTime - preloadTime < schedule[0] + schedule[1]) {
+      while (nextTime - preloadTime < schedule[0] + schedule[1]) {
         var playAt = nextTime
         var playDuration = Math.min(chunkDuration, remaining)
 
