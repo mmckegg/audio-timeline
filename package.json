@@ -1,6 +1,6 @@
 {
   "name": "audio-timeline",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Observ object for arranging, trimming and adjusting multiple audio clips on a timeline using Web Audio.",
   "main": "index.js",
   "scripts": {
