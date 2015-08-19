@@ -41,7 +41,7 @@
     "geval": "^2.1.1",
     "observ": "^0.2.0",
     "observ-default": "^1.0.0",
-    "observ-node-array": "^1.8.0",
+    "observ-node-array": "^1.10.0",
     "observ-struct": "^6.0.0"
   }
 }
