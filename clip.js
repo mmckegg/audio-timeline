@@ -11,8 +11,8 @@ function AudioClip (context) {
   var currentStops = []
   var fullDuration = Property(0)
   var decodeRange = null
-  var chunkDuration = 4
-  var preloadTime = 0.2
+  var chunkDuration = 5
+  var preloadTime = 1
   var loading = 0
 
   var obs = Struct({
@@ -82,6 +82,7 @@ function AudioClip (context) {
     var currentOffset = obs.startOffset()
     var nextTime = startTime
     var remaining = duration
+    var lastPlayer = null
 
     var output = context.audio.createGain()
     output.connect(masterOutput)
@@ -92,51 +93,66 @@ function AudioClip (context) {
 
     var done = context.scheduler(function (schedule) {
 
+      if (remaining <= 0) {
+        stopAt = nextTime
+        return
+      }
+
       if (stopAt != null && schedule[0] + schedule[1] >= stopAt) {
         stopped()
+        return
       }
 
       while (nextTime - preloadTime < schedule[0] + schedule[1]) {
+
         var playAt = nextTime
         var playDuration = Math.min(chunkDuration, remaining)
 
-        nextTime += chunkDuration
         remaining -= playDuration
 
         if (remaining <= 0) {
           playDuration += 0.01
-          stopped()
+          stopAt = nextTime
         }
 
         if (playAt + playDuration > at) {
-          updateLoading(1)
-
-          decodeRange(currentOffset, playDuration, function (err, audioBuffer) {
-            if (audioBuffer) {
-              var player = context.audio.createBufferSource()
-              player.buffer = audioBuffer
-              if (playAt < context.audio.currentTime) {
-                // loaded too late, oh well
-                console.log('play offset', context.audio.currentTime, context.audio.currentTime - playAt)
-                player.start(context.audio.currentTime, context.audio.currentTime - playAt)
-              } else {
-                player.start(playAt)
-              }
-              player.connect(output)
-            }
-            updateLoading(-1)
-          })
+          playRange(currentOffset, playDuration, playAt)
         }
 
+        nextTime += chunkDuration
         currentOffset += chunkDuration
       }
+
     })
 
     function stop (at) {
       if (stopAt == null || at < stopAt) {
         stopAt = at
         output.gain.setTargetAtTime(0, at, 0.001)
+        if (lastPlayer) {
+          lastPlayer.stop(at)
+        }
       }
+    }
+
+    function playRange(offset, duration, at) {
+      updateLoading(1)
+      decodeRange(offset, duration, function (err, audioBuffer) {
+        if (audioBuffer) {
+          var player = context.audio.createBufferSource()
+          var loadTime = context.audio.currentTime
+          player.buffer = audioBuffer
+          if (at < loadTime) {
+            // loaded too late, oh well
+            player.start(loadTime, loadTime - at)
+          } else {
+            player.start(at)
+          }
+          player.connect(output)
+          lastPlayer = player
+        }
+        updateLoading(-1)
+      })
     }
 
     function stopped () {
