@@ -21,6 +21,7 @@ function AudioClip (context) {
     src: Property()
   })
 
+  obs.cuePoints = Property([])
   obs.context = context
   obs.loading = Property(false)
 
@@ -39,11 +40,10 @@ function AudioClip (context) {
     return Math.min(max, duration || max)
   })
 
-
-
   obs.resolved = Struct({
     duration: obs.duration.resolved,
     startOffset: obs.startOffset,
+    cuePoints: obs.cuePoints,
     src: obs.src
   })
 
@@ -60,6 +60,15 @@ function AudioClip (context) {
         fs: context.fs,
         audio: context.audio
       }, onLoad)
+
+      // cue points
+      var timePath = path + '.time'
+      obs.cuePoints.set(null)
+      context.fs.readFile(timePath, function (err, buffer) {
+        if (!err) {
+          obs.cuePoints.set(new Float32Array(new Uint8Array(buffer).buffer))
+        }
+      }) 
     }
   })
 
