@@ -26,7 +26,7 @@ function AudioClip (context) {
   obs.context = context
   obs.loading = Property(false)
 
-  var masterOutput = context.audio.createGain() 
+  var masterOutput = context.audio.createGain()
   masterOutput.connect(context.output)
 
   obs.startOffset.max = fullDuration
@@ -70,7 +70,7 @@ function AudioClip (context) {
         if (!err) {
           obs.cuePoints.set(new Float32Array(new Uint8Array(buffer).buffer))
         }
-      }) 
+      })
     }
   })
 
@@ -163,7 +163,7 @@ function AudioClip (context) {
         done()
         currentStops.splice(index, 1)
       }
-    } 
+    }
 
     done.output = output
     currentStops.push(stop)
