@@ -18,6 +18,7 @@ function AudioClip (context) {
   var obs = Struct({
     startOffset: Property(0),
     duration: Property(),
+    flags: Property([]),
     src: Property()
   })
 
@@ -44,6 +45,7 @@ function AudioClip (context) {
     duration: obs.duration.resolved,
     startOffset: obs.startOffset,
     cuePoints: obs.cuePoints,
+    flags: obs.flags,
     src: obs.src
   })
 
