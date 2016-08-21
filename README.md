@@ -5,6 +5,10 @@ audio-timeline
 
 [![NPM](https://nodei.co/npm/audio-timeline.png)](https://nodei.co/npm/audio-timeline/)
 
+## Status: Deprecated / Unmaintained
+
+This has now been merged into [loop-drop-app](https://github.com/mmckegg/loop-drop-app/tree/master/nodes/recording)
+
 ## Example
 
 ```js
